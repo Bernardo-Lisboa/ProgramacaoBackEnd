@@ -11,49 +11,49 @@ import java.util.List;
 @RequestMapping("/todo/v1")
 public class TodoController {
 
-    // Cria uma lista (identificada por nome)
+    // Create a list
     @PostMapping("/lists/{list}")
     public ResponseEntity<Void> createList(@PathVariable("list") String list) {
         return null;
     }
 
-    // Nomes de todas as listas
+    // All list names
     @GetMapping("/lists")
     public List<String> getListsNames() {
         return null;
     }
 
-    // Tarefas de uma lista, ordenadas por prazo
+    // Task per List, ordered by deadline
     @GetMapping("/lists/{list}/tasks")
     public List<Task> getListTasks(@PathVariable("list") String list) {
         return null;
     }
 
-    // Uma tarefa específica
+    // An especific task
     @GetMapping("/lists/{list}/tasks/{task}")
     public Task getListTask(@PathVariable("list") String list, @PathVariable("task") String task) {
         return null;
     }
 
-    // Cadastra tarefa numa lista
+    // Add a task to a list
     @PostMapping("/lists/{list}/tasks")
     public Task addTask(@PathVariable("list") String list, @RequestBody Task task) {
         return null;
     }
 
-    // Acrescenta anotação a uma tarefa
+    // Add annotation to a task
     @PostMapping("/lists/{list}/tasks/{task}/annotations")
     public Annotation addAnnotation(@PathVariable("list") String list, @PathVariable("task") String task, @RequestBody Annotation annotation) {
         return null;
     }
 
-    // Move tarefa de uma lista para outra
+    // Move a task to a list
     @PostMapping("/lists/{list}/tasks/{task}/move/{toList}")
     public Task moveTask(@PathVariable("list") String list, @PathVariable("task") String task, @PathVariable("toList") String toList) {
         return null;
     }
 
-    // Remove tarefa
+    // Remove a task
     @DeleteMapping("/lists/{list}/tasks/{task}")
     public ResponseEntity<Void> removeTask(@PathVariable("list") String list, @PathVariable("task") String task) {
         return null;
