@@ -1,5 +1,6 @@
 package ifsc.pbe.service;
 
+import ifsc.pbe.entity.Annotation;
 import ifsc.pbe.entity.Task;
 import ifsc.pbe.entity.TaskList;
 import ifsc.pbe.repository.AnnotationRepository;
@@ -8,6 +9,7 @@ import ifsc.pbe.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TaskService {
@@ -36,29 +38,62 @@ public class TaskService {
 
     //Add a task to an existing list
     public Task addTask(String listName, Task task) {
+        if (taskRepository.existsById(task.getName())) {
+            throw new IllegalArgumentException("Tarefa já existe: " + task.getName());
+        }
         TaskList list = findListOrThrow(listName);
         task.setList(list);
         task.setDateTime(LocalDateTime.now());
         return taskRepository.save(task);
     }
-    //Remove a Task
-    public void removeTask(String taskName) {
-        Task task = findTaskOrThrow(taskName);
+    // Add an annotation to a task
+    public Annotation addAnnotation(String listName,String taskName, Annotation annotation) {
+        Task task = findTaskOrThrow(listName,taskName);
+        annotation.setId(null);
+        annotation.setDateTime(LocalDateTime.now());
+        annotation.setTask(task);
+        return annotationRepository.save(annotation);
+    }
+    //Remove a task
+    public void removeTask(String listName,String taskName) {
+        Task task = findTaskOrThrow(listName,taskName);
         taskRepository.delete(task);
     }
 
     // Move a Task to another list
-    public Task moveTask(String taskName, String toListName) {
-        Task task = findTaskOrThrow(taskName);
+    public Task moveTask(String listName,String taskName, String toListName) {
+        Task task = findTaskOrThrow(listName,taskName);
         TaskList toList = findListOrThrow(toListName);
         task.setList(toList);
         task.setDateTime(LocalDateTime.now());
         return taskRepository.save(task);
     }
+    // All list names
+    public List<String> getListNames() {
+        return taskListRepository.findAll()
+                .stream()
+                .map(TaskList::getName)
+                .toList();
+    }
 
-    private Task findTaskOrThrow(String taskName) {
-        return taskRepository.findById(taskName)
+    // Task per List, ordered by deadline
+    public List<Task> getListTasks(String listName) {
+        findListOrThrow(listName);
+        return taskRepository.findByList_NameOrderByDelTime(listName);
+    }
+
+    // An especific task
+    public Task getTask(String listName,String taskName) {
+        return findTaskOrThrow(listName,taskName);
+    }
+
+    private Task findTaskOrThrow(String listName, String taskName) {
+        Task task = taskRepository.findById(taskName)
                 .orElseThrow(() -> new IllegalArgumentException("Tarefa não encontrada: " + taskName));
+        if (!task.getList().getName().equals(listName)) {
+            throw new IllegalArgumentException("Tarefa não pertence à lista: " + listName);
+        }
+        return task;
     }
 
     private TaskList findListOrThrow(String listName) {
